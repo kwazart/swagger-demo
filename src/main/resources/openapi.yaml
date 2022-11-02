@@ -1,0 +1,794 @@
+openapi: 3.0.0
+info:
+  title: Мобильный банкир OpenAPi
+  version: 0.0.1
+servers:
+- description: Local stend
+  url: http://localhost:8080/api/v1
+paths:
+  /mobile-banker:
+    get:
+      operationId: getMobileBanker
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileBanker'
+          description: Успешное получение - Профиль МБ
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод получения мобильного банкира
+      tags:
+      - Mobile banker
+      x-accepts: application/json
+      x-tags:
+      - tag: Mobile banker
+  /mobile-banker/{employeeId}/deleting-device-id:
+    put:
+      operationId: deleteDeviceId
+      parameters:
+      - description: ID сотрудника
+        example: 123456-7890-abcd-ef0123
+        explode: false
+        in: path
+        name: employeeId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод удаления device-id мобильного банкира
+      tags:
+      - Mobile banker
+      x-accepts: application/json
+      x-tags:
+      - tag: Mobile banker
+  /schedule:
+    get:
+      operationId: getMobileBankerSchedule
+      parameters:
+      - description: Начало диапазона графика работы
+        example: 01.11.2022
+        explode: true
+        in: query
+        name: startDate
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: Конец диапазона графика работы
+        example: 02.11.202
+        explode: true
+        in: query
+        name: endDate
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Schedule'
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод получения расписания мобильного банкира
+      tags:
+      - Schedule
+      x-accepts: application/json
+      x-tags:
+      - tag: Schedule
+    post:
+      operationId: addMobileBankerSchedule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Schedule'
+        description: График работы за несколько дней. Не менее одного дня
+        required: true
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод добавления расписания работы мобильного банкира
+      tags:
+      - Schedule
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Schedule
+  /application:
+    post:
+      operationId: addApplication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Application'
+                type: array
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод получения списка заявок по параметрам
+      tags:
+      - Application
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Application
+  /application/{applicationId}/status-transition:
+    put:
+      operationId: updateApplicationStatus
+      parameters:
+      - description: Номер заявки
+        example: 1234
+        explode: false
+        in: path
+        name: applicationId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationStatusTransitionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transition'
+          description: Данные об изменении статуса и сопутствующих параметров
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод обновления статуса заявки по идентификатору
+      tags:
+      - Application
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Application
+  /application/{applicationId}/photo:
+    put:
+      operationId: updateApplicationPhoto
+      parameters:
+      - description: Номер заявки
+        example: 1234
+        explode: false
+        in: path
+        name: applicationId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Суммарный объем передаваемых данных
+        example: 288
+        explode: false
+        in: header
+        name: Content-Length
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Тип содержимого с границей
+        example: multipart/form-data; boundary=----j1bOrwgLvOC3dy7o
+        explode: false
+        in: header
+        name: Content-Type
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Инструкция (в данном случае указывает на загрузку файла)
+        example: form-data; name="upload"; filename="<наименование файла с расширением">
+        explode: false
+        in: header
+        name: Content-Disposition
+        required: true
+        schema:
+          type: boolean
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод добавления/обновления фото в заявке (по идентификатору)
+      tags:
+      - Application
+      x-accepts: application/json
+      x-tags:
+      - tag: Application
+  /application/{applicationId}/cross-sale:
+    put:
+      operationId: updateApplicationCrossSale
+      parameters:
+      - description: Номер заявки
+        example: 1234
+        explode: false
+        in: path
+        name: applicationId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateApplicationCrossSale_request'
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод обновления кросс-продаж в заявке (по идентификатору)
+      tags:
+      - Application
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Application
+  /event:
+    post:
+      operationId: createEvent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        "200":
+          content:
+            application/json: {}
+          description: Успешное выполнение
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorData'
+          description: Ошибка
+      summary: Метод передачи события из МП МБ в АС МБ
+      tags:
+      - Event
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: Event
+components:
+  responses:
+    Error400:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorData'
+      description: Ошибка
+    Empty200:
+      content:
+        application/json: {}
+      description: Успешное выполнение
+  schemas:
+    MobileBanker:
+      example:
+        employeeFullName: Иванов Иван Иванович
+        phone: "74956735665"
+        city: Москва
+        photo: photo
+        position: Менеджер
+        supervisorFullName: Cидоров Василий Иванович
+        email: example@mail.com
+      properties:
+        employeeFullName:
+          description: Полное ФИО МБ
+          example: Иванов Иван Иванович
+          maxLength: 150
+          type: string
+        photo:
+          description: Ссылка на фото сотрудника на ресурсе Банка.
+          maxLength: 1024
+          type: string
+        email:
+          description: Электронная почта
+          example: example@mail.com
+          maxLength: 50
+          type: string
+        phone:
+          description: Мобильный телефон
+          example: "74956735665"
+          maxLength: 15
+          pattern: "^(\\+)\\d{11}$"
+          type: string
+        position:
+          description: специалист
+          example: Менеджер
+          maxLength: 50
+          type: string
+        city:
+          description: Город
+          example: Москва
+          maxLength: 50
+          type: string
+        supervisorFullName:
+          description: Анна Андреевна Семёновна
+          example: Cидоров Василий Иванович
+          maxLength: 150
+          type: string
+      required:
+      - city
+      - email
+      - employeeFullName
+      - phone
+      - position
+      - supervisorFullName
+      type: object
+    Transition:
+      example:
+        endGroupStatus: CONTACT_CLIENT
+        comment: Любые дополнения
+        callCounter: 2
+        endStatus: CONTACT_CLIENT
+      properties:
+        endStatus:
+          description: Конечный статус
+          enum:
+          - AWAITING_DISTRIBUTION
+          - CALL_NACK_CLIENT
+          - CANCELED
+          - CLIENT_IDENTITICATION
+          - CLIENT_IDENTITICATION_DONE
+          - CLIENT_REFUSAL
+          - CONTACT_CLIENT
+          - DOCUMENT_VERIFICATION
+          - DONE
+          - MEETING_CONFIRMED
+          - REVISION
+          - SENT_TO_CONTACT_CENTER
+          example: CONTACT_CLIENT
+          maxLength: 50
+          type: string
+        endGroupStatus:
+          description: "Конечный статус групповой заявки, у которой текущаяя заявк\
+            а является дочерней"
+          enum:
+          - DONE
+          - CLIENT_REFUSAL
+          - SENT_TO_CONTACT_CENTER
+          example: CONTACT_CLIENT
+          maxLength: 50
+          type: string
+        callCounter:
+          description: Счетчик звонков
+          example: 2
+          type: integer
+        comment:
+          description: Комментарий
+          example: Любые дополнения
+          maxLength: 128
+          type: string
+      required:
+      - callCounter
+      - comment
+      - endStatus
+      type: object
+    TimeSlot:
+      example:
+        slotEndTime: "780"
+        slotStartTime: "720"
+        slotId: 2
+        isWorking: true
+      properties:
+        slotId:
+          description: Порядковый номер слота
+          example: 2
+          type: integer
+        slotStartTime:
+          description: Время начала слота
+          example: "720"
+          format: 00:00
+          type: string
+        slotEndTime:
+          description: Время окончания слота
+          example: "780"
+          format: 00:00
+          type: string
+        isWorking:
+          description: Признак рабочего слота
+          example: true
+          type: boolean
+      required:
+      - isWorking
+      - slotEndTime
+      - slotId
+      - slotStartTime
+      type: object
+    ScheduleDateSlot:
+      example:
+        scheduleDate: 02.10.2022
+        isHoliday: false
+        timeSlots:
+        - slotEndTime: "780"
+          slotStartTime: "720"
+          slotId: 2
+          isWorking: true
+        - slotEndTime: "780"
+          slotStartTime: "720"
+          slotId: 2
+          isWorking: true
+        isWeekend: true
+      properties:
+        scheduleDate:
+          description: День в графике
+          example: 02.10.2022
+          format: 27.10.2022
+          type: string
+        isHoliday:
+          description: "Признак нерабочего дня (праздник, распоряжение по компании\
+            \ и пр.)"
+          example: false
+          type: boolean
+        timeSlots:
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+          type: array
+        isWeekend:
+          description: Признак выходного дня
+          example: true
+          type: boolean
+      required:
+      - isHoliday
+      - isWeekend
+      - scheduleDate
+      - timeSlots
+      type: object
+    Schedule:
+      items:
+        $ref: '#/components/schemas/ScheduleDateSlot'
+      type: array
+    Application:
+      description: Заявка
+      example:
+        address: "г. Москва, ул. Островитянова, д.10, кв.101"
+        clientFullName: Иванов Иван Иванович
+        companyName: ООО Ромашка
+        callCounter: 2
+        productName: Вклад
+        startMeetingTime: 08:00
+        phone: "749567356665"
+        meetingDate: 02.11.2022
+        endMeetingTime: "840"
+        comment: Буду до 13%00
+        applicationId: 34786
+        isGroup: false
+        status: CONTACT_CLIENT
+        applications:
+        - null
+        - null
+      properties:
+        applicationId:
+          description: Номер заявки
+          example: 34786
+          type: integer
+        isGroup:
+          description: Признак групповой заявки
+          example: false
+          type: boolean
+        productName:
+          description: "Наименование продукта, отображаемое в МП"
+          example: Вклад
+          maxLength: 50
+          type: string
+        status:
+          description: Системный статус заявки
+          example: CONTACT_CLIENT
+          maxLength: 50
+          type: string
+        meetingDate:
+          description: Дата встречи
+          example: 02.11.2022
+          format: 01.01.2023
+          type: string
+        startMeetingTime:
+          description: Начало слота времени встречи
+          example: 08:00
+          format: 00:00
+          type: string
+        endMeetingTime:
+          description: Конец слота времени встречи
+          example: "840"
+          format: 00:00
+          type: string
+        address:
+          description: Адрес встречи
+          example: "г. Москва, ул. Островитянова, д.10, кв.101"
+          maxLength: 1024
+          type: string
+        clientFullName:
+          description: Полное имя клиента (Контактное лицо)
+          example: Иванов Иван Иванович
+          maxLength: 150
+          type: string
+        phone:
+          description: Телефон клиента (контактно лица)
+          example: "749567356665"
+          maxLength: 15
+          type: string
+        comment:
+          description: Комментарий
+          example: Буду до 13%00
+          maxLength: 128
+          type: string
+        companyName:
+          description: Компания (организация)
+          example: ООО Ромашка
+          maxLength: 64
+          type: string
+        callCounter:
+          description: Количество зарегистрированных звонков клиенту/контактному лицу
+          example: 2
+          type: integer
+        applications:
+          description: Список дочерних заявок
+          items:
+            $ref: '#/components/schemas/Application'
+          type: array
+      required:
+      - address
+      - applicationId
+      - applications
+      - clientFullName
+      - endMeetingTime
+      - isGroup
+      - meetingDate
+      - phone
+      - startMeetingTime
+      - status
+      type: object
+    ErrorData:
+      description: Данные об ошибке
+      properties:
+        errorCode:
+          description: Код ошибки
+          example: 12
+          type: integer
+        errorMessage:
+          description: Описание ошибки
+          example: Не удалось загрузить файл
+          maxLength: 128
+          type: string
+      required:
+      - errorCode
+      - errorMessage
+      type: object
+    Attribute:
+      example:
+        name: systemName
+        value: openDepositApp
+      properties:
+        name:
+          description: Наименование аттрибута
+          example: systemName
+          maxLength: 50
+          type: string
+        value:
+          description: Значение атрибута
+          example: openDepositApp
+          maxLength: 50
+          type: string
+      required:
+      - name
+      type: object
+    Event:
+      example:
+        sourceScreen: Заявки
+        attributes:
+        - name: systemName
+          value: openDepositApp
+        - name: systemName
+          value: openDepositApp
+        event: viewApplication
+      properties:
+        event:
+          description: Системное наименования события
+          example: viewApplication
+          maxLength: 50
+          type: string
+        sourceScreen:
+          description: Название экрана
+          example: Заявки
+          maxLength: 50
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/Attribute'
+          type: array
+      required:
+      - event
+      type: object
+    ApplicationRequest:
+      description: Параметры для поиска заявок
+      example:
+        endDate: 09.11.2022
+        statuses:
+        - AWAITING_DISTRIBUTION
+        - CONTACT_CLIENT
+        isGroup: false
+        startDate: 02.11.2022
+      properties:
+        isGroup:
+          description: Признак групповой заявки
+          example: false
+          type: boolean
+        statuses:
+          description: Список системных статусов
+          example:
+          - AWAITING_DISTRIBUTION
+          - CONTACT_CLIENT
+          items:
+            enum:
+            - AWAITING_DISTRIBUTION
+            - CALL_NACK_CLIENT
+            - CANCELED
+            - CLIENT_IDENTITICATION
+            - CLIENT_IDENTITICATION_DONE
+            - CLIENT_REFUSAL
+            - CONTACT_CLIENT
+            - DOCUMENT_VERIFICATION
+            - DONE
+            - MEETING_CONFIRMED
+            - REVISION
+            - SENT_TO_CONTACT_CENTER
+            type: string
+          type: array
+        startDate:
+          description: Начало периода
+          example: 02.11.2022
+          format: 01.01.2022
+          type: string
+        endDate:
+          description: Конец периода
+          example: 09.11.2022
+          format: 01.01.2022
+          type: string
+      type: object
+    ApplicationStatusTransitionRequest:
+      example:
+        communicationChannel: call
+        communicationResult: CALL_FAILED
+        startStatus: AWAITING_DISTRIBUTION
+        comment: Любая дополнительная информация
+        isGroup: false
+        callCounter: 3
+        endStatus: DONE
+      properties:
+        isGroup:
+          description: Признак групповой заявки
+          example: false
+          type: boolean
+        communicationChannel:
+          description: Канал коммуникации
+          enum:
+          - call
+          - other
+          example: call
+          type: string
+        startStatus:
+          description: Текущий статус заявки
+          enum:
+          - AWAITING_DISTRIBUTION
+          - CALL_NACK_CLIENT
+          - CANCELED
+          - CLIENT_IDENTITICATION
+          - CLIENT_IDENTITICATION_DONE
+          - CLIENT_REFUSAL
+          - CONTACT_CLIENT
+          - DOCUMENT_VERIFICATION
+          - DONE
+          - MEETING_CONFIRMED
+          - REVISION
+          - SENT_TO_CONTACT_CENTER
+          example: AWAITING_DISTRIBUTION
+          type: string
+        endStatus:
+          description: Текущий статус заявки
+          enum:
+          - AWAITING_DISTRIBUTION
+          - CALL_NACK_CLIENT
+          - CANCELED
+          - CLIENT_IDENTITICATION
+          - CLIENT_IDENTITICATION_DONE
+          - CLIENT_REFUSAL
+          - CONTACT_CLIENT
+          - DOCUMENT_VERIFICATION
+          - DONE
+          - MEETING_CONFIRMED
+          - REVISION
+          - SENT_TO_CONTACT_CENTER
+          example: DONE
+          type: string
+        callCounter:
+          description: Счетчик количества звонков по заявке
+          example: 3
+          type: integer
+        communicationResult:
+          description: Результат коммуникации с клиентом
+          enum:
+          - CALL_FAILED
+          - MEETING_CONFIRMED
+          - CLIENT_CANCEL
+          example: CALL_FAILED
+          type: string
+        comment:
+          description: Комментарий МБ
+          example: Любая дополнительная информация
+          maxLength: 2048
+          type: string
+      type: object
+    updateApplicationCrossSale_request:
+      description: Список системных наименование продуктов
+      properties:
+        products:
+          example:
+          - CREDIT_CARD
+          - DEPOSIT
+          items:
+            type: string
+          type: array
+      type: object
